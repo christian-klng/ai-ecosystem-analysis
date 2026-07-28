@@ -75,22 +75,24 @@ Aufbau von oben nach unten, bewusst in der Reihenfolge der KMU-Entscheidungsfrag
 
 ### 4.1 Erhebungseinheit
 
-Ein Steckbrief beschreibt **ein Angebot**: eine für ein Unternehmen abgrenzbare, in Anspruch nehmbare Leistung mit erkennbarem Zugangsweg. Träger sind eine eigene, schlanke Entität (Name, Typ, Rechtsform, Rolle, URL), auf die Steckbriefe verweisen.
+Ein Steckbrief beschreibt **ein Angebot** — nicht im rechtlichen Sinne, sondern ein Angebot, sich zu **vernetzen**, zu **lernen**, zu **kooperieren** oder eine **Leistung zu buchen** (kostenlos oder kostenpflichtig): eine für ein Unternehmen abgrenzbare, in Anspruch nehmbare Leistung mit erkennbarem Zugangsweg. Träger sind eine eigene, schlanke Entität (Name, Typ, Rechtsform, Rolle, URL), auf die Steckbriefe verweisen.
 
 Faustregel für die Abgrenzung: *Kann man einen Satz bilden, der mit „Ein Unternehmen erhält …" beginnt und mit „… indem es …" fortfährt?* Wenn nein, ist es eine Organisation, ein Ort oder eine Marke — und kein Steckbrief. Für solche Fälle gibt es einen kürzeren Eintragstyp **„Anlaufstelle"** (Ort/Institution ohne definierte Leistung), damit sie auffindbar bleiben, ohne die Angebotslogik zu verwässern.
 
 ### 4.2 Aufnahmekriterien
 
-Aufgenommen wird ein Angebot, wenn es **alle vier** Kriterien erfüllt:
+Aufgenommen wird ein Angebot, wenn diese Kriterien erfüllt sind:
 
-1. **Fortbestandstest** — Besteht das Angebot fort, wenn kein Auftrag zustande kommt?
-2. **Zugangstest** — Ist Teilnahme ohne vorgeschaltetes Verkaufsgespräch möglich?
-3. **Ergebnistest** — Ist geklärt und offengelegt, wem das Ergebnis gehört?
-4. **Governancetest** — Gibt es eine offengelegte Trägerschaft, Finanzierung oder Mitgliedschaftsordnung?
+1. **Berlin-Bezug** — Sitz, Zuständigkeit oder ausdrückliche Öffnung für Berliner Unternehmen.
+2. **KI-Bezug** — thematischer Bezug zu KI oder KI-nahen Digitalisierungsfragen.
+3. **Substanz statt reiner Vermarktung** — das Angebot geht über reines Coworking, reine Büro-/Flächenvermietung und reinen Software-Vertrieb hinaus (etwa durch Schulungen, Meetups oder Konferenzen).
+4. **Governance** — offengelegte Trägerschaft, Finanzierung und (bei Unternehmen) Rechtsform, oder eine Mitgliedschaftsordnung.
 
-Zusätzlich: erkennbarer Berlin-Bezug (Sitz, Zuständigkeit oder ausdrückliche Öffnung für Berliner Unternehmen) und thematischer Bezug zu KI oder KI-nahen Digitalisierungsfragen.
+**Qualität, kein Gate:** Ein vorgeschaltetes Gespräch wertet ein Angebot ab, schließt es aber nicht aus — ein persönlicher Kontaktweg ist einer bloß generischen E-Mail-Adresse sogar vorzuziehen. Die Eigentumsfrage am Ergebnis ist für die Aufnahme unerheblich.
 
-**Ausgeschlossen:** kommerzielle Beratungs-, Agentur- und Softwareangebote ohne strukturbildenden Charakter; Lead-Generierungsseiten im Gewand von Förderübersichten; reine Diskurs- und Positionsformate ohne Unterstützungsleistung.
+**Events und Konferenzen** werden aufgenommen, sobald sie **entweder** regelmäßig stattfinden (z. B. monatlich) **oder** eine gewisse Größe erreichen (Richtwert ~100 Teilnehmende, geschätzt; bekannte Sponsoren als Indikator).
+
+**Ausgeschlossen:** reines Coworking und reine Büro-/Flächenvermietung; reine Software-Produktvermarktung („Demo-Termin buchen") ohne darüber hinausgehendes Format; Lead-Generierungsseiten im Gewand von Förderübersichten; einmalige Diskurs- und Positionsformate ohne Unterstützungsleistung, die weder regelmäßig noch von relevanter Größe sind. Kommerzielle Beratungs-, Agentur- und Softwareanbieter sind damit **nicht pauschal ausgeschlossen**, sondern aufzunehmen (und zu kennzeichnen), wenn sie strukturbildende Formate bieten.
 
 **Grenzfälle werden aufgenommen und gekennzeichnet**, nicht stillschweigend weggelassen — mit einem Feld `abgrenzung_hinweis`. Die Vorrecherche liefert die Referenzfälle: eindeutig strukturbildend (KI-Netzwerk Handwerk, Zukunftszentrum, KI-Servicezentrum, KI-Campus, PyData Berlin, daten.berlin.de); bewusst hybrid mit tragfähiger Struktur (KI Bundesverband, KI Park e. V.); Strukturanmutung über kommerziellem Kern (Merantix AI Campus, ai.berlin); reine Dienstleistungswerbung mit Struktur-Vokabular (diverse „AI Accelerator"- und Förderratgeber-Angebote).
 
@@ -320,7 +322,7 @@ Phase 1 vor Phase 2 ist nicht verhandelbar. Ein Schema, das nicht an den schwier
 |---|---|---|
 | 1 | **Name und Domain** | „Kompass" ist im Berliner Feld bereits belegt (Zukunftszentrum-„Beratungskompass", DAB-„Ethik-Kompass für KI", Förderprogramm KOMPASS). Vor der Festlegung eine kurze Markenprüfung. Alternativen in Richtung „KI-Angebote Berlin" oder „Was gibt es für mich?" |
 | 2 | **Räumlicher Zuschnitt** | Berlin als Kern, Berlin-Brandenburg-Angebote aufnehmen und als solche kennzeichnen — MDZ Berlin und EDIH pro_digital adressieren beide Länder, ein reiner Berlin-Filter würde sie verlieren |
-| 3 | **Privatwirtschaftliche Angebote** | Aufnehmen, wenn die vier Kriterien aus 4.2 erfüllt sind — nicht pauschal ausschließen. Sonst fehlen strukturtragende Akteure wie der Merantix AI Campus. Kennzeichnung über Trägertyp und `abgrenzung_hinweis` |
+| 3 | **Privatwirtschaftliche Angebote** | Aufnehmen, wenn die Kriterien aus 4.2 erfüllt sind — nicht pauschal ausschließen. Sonst fehlen strukturtragende Akteure wie der Merantix AI Campus. Kennzeichnung über Trägertyp und `abgrenzung_hinweis` |
 | 4 | **Zielumfang** | 80–120 Steckbriefe sind realistisch pflegbar. Vollständigkeit ist kein sinnvolles Ziel; Aktualität ist es |
 | 5 | **Öffentliche Sichtbarkeit des Transparenzindex** | zunächst nur aggregiert (siehe 7.4) |
 | 6 | **Betreiber und Hosting** | HWR als federführende Hochschule; Hosting statisch. Barrierefreiheitspflicht und Impressumsfrage hängen daran |

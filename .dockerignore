@@ -1,0 +1,14 @@
+node_modules
+dist
+.astro
+.git
+.gitignore
+.DS_Store
+*.log
+npm-debug.log*
+.claude
+scratchpad
+recherche
+PLAN.md
+DEPLOYMENT.md
+README.md

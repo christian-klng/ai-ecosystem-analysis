@@ -1,0 +1,20 @@
+{
+  "name": "ki-angebote-berlin",
+  "type": "module",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Angebotskompass Berliner KI-Ökosystem — redaktionell gepflegte Steckbriefe von Unterstützungsangeboten für Berliner KMU",
+  "scripts": {
+    "dev": "astro dev",
+    "build": "npm run validate && astro build",
+    "preview": "astro preview",
+    "check": "astro check",
+    "validate": "node scripts/validate-changelog.mjs"
+  },
+  "dependencies": {
+    "astro": "^5.6.1"
+  },
+  "devDependencies": {
+    "js-yaml": "^4.3.0"
+  }
+}

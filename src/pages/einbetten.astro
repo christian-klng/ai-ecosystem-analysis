@@ -1,0 +1,77 @@
+---
+import Base from '../layouts/Base.astro';
+
+const site = 'https://ki-angebote.berlin';
+
+const iframeCode = `<iframe
+  src="${site}/angebote?embed=1&kostenmodell=kostenfrei"
+  title="KI-Angebote Berlin"
+  style="width:100%;border:0"
+  loading="lazy"></iframe>`;
+
+const autoResize = `<script>
+  window.addEventListener('message', function (e) {
+    if (e.data && e.data.kiAngeboteBerlin && typeof e.data.height === 'number') {
+      var frame = document.querySelector('iframe[src*="ki-angebote.berlin"]');
+      if (frame) frame.style.height = e.data.height + 'px';
+    }
+  });
+<\/script>`;
+
+const jsonCode = `fetch('${site}/api/angebote.json')
+  .then(function (r) { return r.json(); })
+  .then(function (data) {
+    // data.angebote: Array aller Steckbriefe
+    console.log(data.angebote.length + ' Angebote');
+  });`;
+---
+
+<Base
+  title="Einbetten und offene Daten"
+  description="Wie sich das Verzeichnis in andere Websites einbetten lässt und wie die Daten offen weiterverwendet werden können."
+  nav="einbetten"
+>
+  <div class="prose" style="max-width:52rem">
+    <h1>Einbetten und offene Daten</h1>
+    <p class="section-intro">
+      Das Verzeichnis ist als Datenquelle gedacht, nicht als konkurrierendes Portal. Partner wie
+      Kammern, Wirtschaftsförderung oder die Technologiestiftung können die Inhalte in ihren eigenen
+      Auftritten zeigen.
+    </p>
+
+    <h2>1. Als iFrame einbetten</h2>
+    <p>
+      Der Parameter <code>?embed=1</code> blendet Kopf- und Fußbereich aus. Alle Filter lassen sich
+      über die URL vorbelegen – das Beispiel zeigt nur kostenfreie Angebote:
+    </p>
+    <pre><code>{iframeCode}</code></pre>
+
+    <p>
+      Damit die eingebettete Ansicht ohne inneren Scrollbalken mitwächst, meldet die Seite ihre
+      Höhe per <code>postMessage</code>. Fügen Sie dazu auf Ihrer Seite diesen Empfänger ein:
+    </p>
+    <pre><code>{autoResize}</code></pre>
+
+    <h2>2. Offene Daten</h2>
+    <p>Der vollständige Bestand steht maschinenlesbar bereit:</p>
+    <ul>
+      <li><a href="/api/angebote.json">/api/angebote.json</a> — alle Steckbriefe mit allen Feldern</li>
+      <li><a href="/api/aenderungen.json">/api/aenderungen.json</a> — der Änderungsstrom als JSON</li>
+      <li><a href="/aenderungen.xml">/aenderungen.xml</a> — der Änderungsstrom als Atom-Feed zum Abonnieren</li>
+    </ul>
+    <pre><code>{jsonCode}</code></pre>
+
+    <h2>Lizenz</h2>
+    <p>
+      Die Inhalte stehen unter <strong>CC BY 4.0</strong>, der Quellcode unter der MIT-Lizenz. Bei
+      Weiterverwendung bitte „KI-Angebote Berlin“ als Quelle nennen. Verbindlich für Konditionen
+      und Verfügbarkeit ist stets die Auskunft des jeweiligen Trägers.
+    </p>
+
+    <h2>Web Component</h2>
+    <p style="color:var(--fg-muted)">
+      Für Partner, die keine iFrames einsetzen möchten, ist eine gekapselte Web-Component-Variante
+      vorgesehen. Sie ist noch nicht Teil dieser frühen Fassung – sprechen Sie uns bei Bedarf an.
+    </p>
+  </div>
+</Base>

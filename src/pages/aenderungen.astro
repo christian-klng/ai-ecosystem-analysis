@@ -1,0 +1,70 @@
+---
+import { getCollection } from 'astro:content';
+import Base from '../layouts/Base.astro';
+import { datum } from '../lib/labels';
+import { aenderungsstrom, naechstePruefung, pruefungUeberfaellig, ART_LABEL } from '../lib/steckbrief';
+
+const angebote = await getCollection('angebote');
+const heute = new Date();
+const strom = aenderungsstrom(angebote);
+
+// Überfällige Prüfungen sichtbar machen (redaktioneller Druck, PLAN.md 5.2).
+const ueberfaellig = angebote
+  .filter((a) => pruefungUeberfaellig(a, heute))
+  .sort((a, b) => naechstePruefung(a).getTime() - naechstePruefung(b).getTime());
+---
+
+<Base
+  title="Was ist neu"
+  description="Chronologischer Änderungsverlauf aller Steckbriefe, inklusive Statuswechseln und fälliger Prüfungen."
+  nav="aenderungen"
+>
+  <h1>Was ist neu</h1>
+  <p class="section-intro">
+    Jede Aufnahme, jede inhaltliche Änderung und jeder Statuswechsel wird hier protokolliert.
+    Diesen Verlauf gibt es auch als <a href="/aenderungen.xml">Atom-Feed</a> zum Abonnieren.
+  </p>
+
+  {
+    ueberfaellig.length > 0 && (
+      <section aria-labelledby="h-faellig">
+        <h2 id="h-faellig">Fällige Prüfungen ({ueberfaellig.length})</h2>
+        <p class="section-intro">
+          Diese Steckbriefe haben ihr Prüfintervall überschritten und sollten als Nächstes
+          kontrolliert werden.
+        </p>
+        <ul class="strom">
+          {ueberfaellig.map((a) => (
+            <li>
+              <span class="strom-datum">seit {datum(naechstePruefung(a))}</span>
+              <span class="strom-art">überfällig</span>
+              <span class="strom-text">
+                <a href={`/angebote/${a.slug}`}>{a.data.name}</a>
+                {` — zuletzt geprüft ${datum(a.data.geprueft_am)}`}
+              </span>
+            </li>
+          ))}
+        </ul>
+      </section>
+    )
+  }
+
+  <section aria-labelledby="h-verlauf">
+    <h2 id="h-verlauf">Verlauf ({strom.length} Einträge)</h2>
+    <ul class="strom">
+      {
+        strom.map((e) => (
+          <li>
+            <span class="strom-datum">{datum(e.datum)}</span>
+            <span class={`strom-art ${e.art}`}>{ART_LABEL[e.art] ?? e.art}</span>
+            <span class="strom-text">
+              <a href={`/angebote/${e.angebotSlug}`}>{e.angebotName}</a>
+              {e.feld ? ` (${e.feld})` : ''}
+              {e.notiz ? ` — ${e.notiz}` : ''}
+            </span>
+          </li>
+        ))
+      }
+    </ul>
+  </section>
+</Base>

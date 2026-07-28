@@ -1,0 +1,107 @@
+---
+import { getCollection } from 'astro:content';
+import Base from '../layouts/Base.astro';
+import { SITUATIONEN, datum } from '../lib/labels';
+import { aenderungsstrom, ART_LABEL } from '../lib/steckbrief';
+
+const angebote = await getCollection('angebote');
+const aktive = angebote.filter((a) => a.data.status === 'aktiv').length;
+
+// Situations-Kacheln verlinken auf vorgefilterte Angebotslisten.
+function situationHref(leistungsarten: string[]): string {
+  const p = new URLSearchParams();
+  for (const l of leistungsarten) p.append('leistungsart', l);
+  return `/angebote?${p.toString()}`;
+}
+
+const voraussetzungen = [
+  { frage: 'Kostenfrei und ohne Antrag sofort nutzbar', href: '/angebote?kostenmodell=kostenfrei&zugangsregime=offen' },
+  { frage: 'Mit Antrag und etwas Vorlauf', href: '/angebote?zugangsregime=antragspflichtig' },
+  { frage: 'Speziell fürs Handwerk', href: '/angebote?zielgruppe=handwerk' },
+  { frage: 'Für Solo- und Kleinstunternehmen', href: '/angebote?zielgruppe=kleinst-solo' },
+];
+
+const strom = aenderungsstrom(angebote).slice(0, 6);
+---
+
+<Base
+  title="KI-Angebote Berlin"
+  description="Wegweiser durch die Unterstützungsangebote für Berliner KMU rund um Künstliche Intelligenz – geordnet nach Ihrer Situation, mit nachvollziehbarem Aktualisierungsstand."
+  nav="start"
+>
+  <section class="hero">
+    <h1>Welche KI-Unterstützung passt zu meinem Unternehmen?</h1>
+    <p class="lead">
+      Berlin bietet Dutzende Programme, Beratungen und Netzwerke rund um Künstliche Intelligenz –
+      aber sie sind schwer zu überblicken, und viele sind schneller veraltet, als es die
+      Trägerseiten zeigen. Dieser Wegweiser ordnet sie nach Ihrer Situation und sagt bei jedem
+      Angebot, wann es zuletzt geprüft wurde.
+    </p>
+    <p style="color:var(--fg-muted)">
+      Derzeit {angebote.length} Steckbriefe, davon {aktive} aktiv nutzbar.
+    </p>
+  </section>
+
+  <section aria-labelledby="h-situation">
+    <h2 id="h-situation">Wobei stehen Sie gerade?</h2>
+    <p class="section-intro">
+      Der schnellste Einstieg. Wählen Sie die Situation, die am ehesten passt – Sie landen direkt
+      bei den dazu passenden Angeboten.
+    </p>
+    <ul class="tile-grid">
+      {
+        SITUATIONEN.map((s) => (
+          <li>
+            <a class="tile" href={situationHref(s.leistungsarten)}>
+              <span class="tile-frage">{s.frage}</span>
+              <span class="tile-meta">Passende Angebote ansehen →</span>
+            </a>
+          </li>
+        ))
+      }
+    </ul>
+  </section>
+
+  <section aria-labelledby="h-voraussetzung">
+    <h2 id="h-voraussetzung">Oder nach Voraussetzung filtern</h2>
+    <p class="section-intro">Die Frage, die am meisten Zeit spart: Was können Sie sofort nutzen, und wofür brauchen Sie Vorlauf?</p>
+    <ul class="tile-grid">
+      {
+        voraussetzungen.map((v) => (
+          <li>
+            <a class="tile" href={v.href}>
+              <span class="tile-frage">{v.frage}</span>
+              <span class="tile-meta">Filtern →</span>
+            </a>
+          </li>
+        ))
+      }
+    </ul>
+    <p style="margin-top:1rem">
+      <a class="btn btn-primary" href="/angebote">Alle {angebote.length} Angebote mit Filter ansehen</a>
+    </p>
+  </section>
+
+  <section aria-labelledby="h-neu">
+    <h2 id="h-neu">Was sich zuletzt geändert hat</h2>
+    <p class="section-intro">
+      Der eigentliche Mehrwert dieses Verzeichnisses: Wir dokumentieren, wann ein Angebot ausläuft,
+      beendet wird oder sich inhaltlich ändert – auch dann, wenn die Trägerseite es nicht tut.
+    </p>
+    <ul class="strom">
+      {
+        strom.map((e) => (
+          <li>
+            <span class="strom-datum">{datum(e.datum)}</span>
+            <span class={`strom-art ${e.art}`}>{ART_LABEL[e.art] ?? e.art}</span>
+            <span class="strom-text">
+              <a href={`/angebote/${e.angebotSlug}`}>{e.angebotName}</a>
+              {e.notiz ? ` — ${e.notiz}` : ''}
+            </span>
+          </li>
+        ))
+      }
+    </ul>
+    <p style="margin-top:1rem"><a href="/aenderungen">Vollständiger Änderungsverlauf →</a></p>
+  </section>
+</Base>

@@ -1,0 +1,233 @@
+---
+import { getCollection, getEntry, getEntries } from 'astro:content';
+import Base from '../../layouts/Base.astro';
+import StatusBanner from '../../components/StatusBanner.astro';
+import Kernblock from '../../components/Kernblock.astro';
+import Aktualisierung from '../../components/Aktualisierung.astro';
+import {
+  LEISTUNGSART_LABEL,
+  BEDARFSPHASE_LABEL,
+  KI_KOMPETENZ_LABEL,
+  RESSORTLOGIK_LABEL,
+  RAEUMLICH_LABEL,
+  TRAEGERTYP_LABEL,
+  ZIELGRUPPE_LABEL,
+  datum,
+  label,
+} from '../../lib/labels';
+
+export async function getStaticPaths() {
+  const angebote = await getCollection('angebote');
+  return angebote.map((angebot) => ({
+    params: { slug: angebot.slug },
+    props: { angebot },
+  }));
+}
+
+const { angebot } = Astro.props;
+const d = angebot.data;
+const heute = new Date();
+
+const traeger = await getEntries(d.traeger);
+const { Content } = await angebot.render();
+
+// Beziehungen auflösen
+async function resolve(refs: { id: string }[]) {
+  const entries = await Promise.all(refs.map((r) => getEntry('angebote', r.id)));
+  return entries.filter((e): e is NonNullable<typeof e> => Boolean(e));
+}
+const ermoeglichtDurch = await resolve(d.ermoeglicht_durch);
+const kombinierbar = await resolve(d.kombinierbar_mit);
+const aehnlich = await resolve(d.aehnlich_zu);
+const nachfolgerVon = d.nachfolger_von ? await getEntry('angebote', d.nachfolger_von.id) : null;
+
+const istAnlaufstelle = d.eintragstyp === 'anlaufstelle';
+
+// mailto für den Meldeweg mit vorbefülltem Betreff (kein Formular, kein Backend)
+const meldeBetreff = encodeURIComponent(`Angabe korrigieren: ${d.name} [${angebot.slug}]`);
+const meldeMailto = `mailto:redaktion@ki-angebote.berlin?subject=${meldeBetreff}`;
+---
+
+<Base title={d.name} description={d.kurzbeschreibung} nav="angebote" embeddable={true}>
+  <article data-pagefind-body>
+    <p style="font-size:0.9rem;margin-bottom:0.5rem">
+      <a href="/angebote">← Alle Angebote</a>
+    </p>
+
+    <StatusBanner angebot={angebot} />
+
+    <header class="steckbrief-head">
+      {istAnlaufstelle && <span class="badge" style="margin-bottom:0.5rem">Anlaufstelle</span>}
+      <h1>{d.name}</h1>
+      <p class="traeger-zeile">
+        {
+          traeger.map((t, i) => (
+            <>
+              {i > 0 && ', '}
+              {t.data.url ? <a href={t.data.url}>{t.data.name}</a> : t.data.name}
+            </>
+          ))
+        }
+      </p>
+      <p class="steckbrief-lead">{d.was_bekomme_ich ?? d.kurzbeschreibung}</p>
+    </header>
+
+    <div class="detail-grid">
+      <div class="detail-main">
+        <Kernblock angebot={angebot} />
+
+        {
+          d.konflikthinweis && (
+            <p class="hinweis konflikt">
+              <strong>Widersprüchliche Quellen:</strong> {d.konflikthinweis}
+            </p>
+          )
+        }
+        {
+          d.abgrenzung_hinweis && (
+            <p class="hinweis">
+              <strong>Abgrenzung:</strong> {d.abgrenzung_hinweis}
+            </p>
+          )
+        }
+        {
+          nachfolgerVon && (
+            <p class="hinweis">
+              Vorläuferangebot: <a href={`/angebote/${nachfolgerVon.slug}`}>{nachfolgerVon.data.name}</a>
+            </p>
+          )
+        }
+
+        <div class="prose">
+          <Content />
+        </div>
+
+        {
+          (ermoeglichtDurch.length > 0 || kombinierbar.length > 0) && (
+            <section>
+              <h2>Passt dazu</h2>
+              {ermoeglichtDurch.length > 0 && (
+                <>
+                  <h3>Wird finanziell ermöglicht durch</h3>
+                  <ul class="related-list">
+                    {ermoeglichtDurch.map((e) => (
+                      <li>
+                        <a href={`/angebote/${e.slug}`}>{e.data.name}</a>
+                      </li>
+                    ))}
+                  </ul>
+                </>
+              )}
+              {kombinierbar.length > 0 && (
+                <>
+                  <h3>Gut kombinierbar mit</h3>
+                  <ul class="related-list">
+                    {kombinierbar.map((e) => (
+                      <li>
+                        <a href={`/angebote/${e.slug}`}>{e.data.name}</a>
+                      </li>
+                    ))}
+                  </ul>
+                </>
+              )}
+            </section>
+          )
+        }
+
+        {
+          d.links.length > 0 && (
+            <section>
+              <h2>Quellen</h2>
+              <ul class="quellen-liste">
+                {d.links.map((l) => (
+                  <li>
+                    <a href={l.url}>{l.titel}</a>
+                    <span class="abgerufen"> — abgerufen am {datum(l.abgerufen)}</span>
+                  </li>
+                ))}
+              </ul>
+            </section>
+          )
+        }
+
+        <a class="meld-link btn" href={meldeMailto}>Angabe ist falsch oder veraltet? Melden</a>
+
+        <Aktualisierung angebot={angebot} heute={heute} />
+      </div>
+
+      <aside class="detail-aside" aria-label="Einordnung">
+        <h3>Einordnung</h3>
+        <dl>
+          {
+            aehnlich.length > 0 && (
+              <div>
+                <dt>Ähnliche Angebote</dt>
+                <dd>
+                  {aehnlich.map((e, i) => (
+                    <>
+                      {i > 0 && ', '}
+                      <a href={`/angebote/${e.slug}`}>{e.data.name}</a>
+                    </>
+                  ))}
+                </dd>
+              </div>
+            )
+          }
+          <div>
+            <dt>Leistungsart</dt>
+            <dd>{d.leistungsart.map((x) => label(LEISTUNGSART_LABEL, x)).join(', ') || '—'}</dd>
+          </div>
+          <div>
+            <dt>Phase</dt>
+            <dd>{d.bedarfsphase.map((x) => label(BEDARFSPHASE_LABEL, x)).join(', ') || '—'}</dd>
+          </div>
+          <div>
+            <dt>KI-Kompetenz</dt>
+            <dd>{label(KI_KOMPETENZ_LABEL, d.ki_kompetenz)}</dd>
+          </div>
+          <div>
+            <dt>Zielgruppe</dt>
+            <dd>{d.zielgruppe.map((x) => label(ZIELGRUPPE_LABEL, x)).join(', ') || '—'}</dd>
+          </div>
+          {
+            d.zielgruppe_ausschluss.length > 0 && (
+              <div>
+                <dt>Einschränkung</dt>
+                <dd>{d.zielgruppe_ausschluss.join('; ')}</dd>
+              </div>
+            )
+          }
+          <div>
+            <dt>Träger</dt>
+            <dd>{label(TRAEGERTYP_LABEL, d.traegertyp)}</dd>
+          </div>
+          <div>
+            <dt>Ressortlogik</dt>
+            <dd>{label(RESSORTLOGIK_LABEL, d.ressortlogik)}</dd>
+          </div>
+          <div>
+            <dt>Räumlicher Bezug</dt>
+            <dd>{label(RAEUMLICH_LABEL, d.raeumlich)}</dd>
+          </div>
+          {
+            d.kontakt && (d.kontakt.name || d.kontakt.mail || d.kontakt.tel || d.kontakt.weg) && (
+              <div>
+                <dt>Kontakt</dt>
+                <dd>
+                  {d.kontakt.name && <div>{d.kontakt.name}</div>}
+                  {d.kontakt.mail && (
+                    <div>
+                      <a href={`mailto:${d.kontakt.mail}`}>{d.kontakt.mail}</a>
+                    </div>
+                  )}
+                  {d.kontakt.tel && <div>{d.kontakt.tel}</div>}
+                  {d.kontakt.weg && <div style="color:var(--fg-muted)">{d.kontakt.weg}</div>}
+                </dd>
+              </div>
+            )
+          }
+        </dl>
+      </aside>
+    </div>
+  </article>
+</Base>

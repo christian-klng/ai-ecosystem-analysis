@@ -1,0 +1,51 @@
+---
+import {
+  ZIELGRUPPE_LABEL,
+  KOSTENMODELL_LABEL,
+  ZUGANGSREGIME_LABEL,
+  BINDUNGSTIEFE_LABEL,
+  label,
+} from '../lib/labels';
+import type { Angebot } from '../lib/steckbrief';
+
+interface Props {
+  angebot: Angebot;
+}
+const { angebot } = Astro.props;
+const d = angebot.data;
+
+const zielgruppen = d.zielgruppe.map((z) => label(ZIELGRUPPE_LABEL, z)).join(', ') || 'Nicht näher eingegrenzt';
+
+// Kosten inkl. Eigenanteil, falls beziffert.
+let kosten = label(KOSTENMODELL_LABEL, d.kostenmodell);
+let kostenSub = '';
+if (d.kostenmodell === 'gefoerdert' && d.eigenanteil_prozent != null) {
+  kostenSub = `Eigenanteil ${d.eigenanteil_prozent} %`;
+} else if (d.kostenmodell === 'nicht-angegeben') {
+  kostenSub = 'Der Träger macht keine Angabe.';
+}
+
+const zugang = label(ZUGANGSREGIME_LABEL, d.zugangsregime);
+const aufwand = d.aufwand_hinweis || label(BINDUNGSTIEFE_LABEL, d.bindungstiefe);
+---
+<dl class="kernblock">
+  <div>
+    <dt>Für wen?</dt>
+    <dd>{zielgruppen}</dd>
+  </div>
+  <div>
+    <dt>Was kostet es?</dt>
+    <dd>
+      {kosten}
+      {kostenSub && <span class="sub">{kostenSub}</span>}
+    </dd>
+  </div>
+  <div>
+    <dt>Wie komme ich rein?</dt>
+    <dd>{zugang}</dd>
+  </div>
+  <div>
+    <dt>Wie viel Zeit kostet es mich?</dt>
+    <dd>{aufwand}</dd>
+  </div>
+</dl>

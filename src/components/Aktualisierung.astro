@@ -1,0 +1,77 @@
+---
+import { datum, label } from '../lib/labels';
+import { letzteAenderung, naechstePruefung, pruefungUeberfaellig, tageSeitPruefung, ART_LABEL } from '../lib/steckbrief';
+import type { Angebot } from '../lib/steckbrief';
+
+interface Props {
+  angebot: Angebot;
+  heute: Date;
+}
+const { angebot, heute } = Astro.props;
+const d = angebot.data;
+
+// Kern der Fußzeile: "geprüft" (kontrolliert, war richtig) und "geändert"
+// (ein Feld hat sich inhaltlich geändert) getrennt ausweisen (PLAN.md 5.3).
+const aenderung = letzteAenderung(angebot);
+const naechste = naechstePruefung(angebot);
+const ueberfaellig = pruefungUeberfaellig(angebot, heute);
+const tage = tageSeitPruefung(angebot, heute);
+
+// Historie absteigend nach Datum.
+const historie = [...d.changelog].sort((a, b) => b.datum.getTime() - a.datum.getTime());
+---
+<footer class={`aktualisierung ${ueberfaellig ? 'ueberfaellig' : ''}`} aria-label="Aktualisierungsstand">
+  <div class="zeile">
+    <span>Zuletzt vollständig geprüft:</span>
+    <strong>{datum(d.geprueft_am)}</strong>
+    <span>({d.geprueft_von})</span>
+  </div>
+  <div class="zeile">
+    <span>Letzte inhaltliche Änderung:</span>
+    {
+      aenderung ? (
+        <strong>{datum(aenderung.datum)}</strong>
+        <span>— {aenderung.feld ? `${aenderung.feld}: ` : ''}{aenderung.notiz}</span>
+      ) : (
+        <span>seit Aufnahme keine</span>
+      )
+    }
+  </div>
+  <div class="zeile">
+    <span>Nächste Prüfung vorgesehen:</span>
+    <strong>{datum(naechste)}</strong>
+    {
+      ueberfaellig && (
+        <span class="veraltet-warnung">
+          — überfällig; Angaben seit {tage} Tagen nicht geprüft
+        </span>
+      )
+    }
+  </div>
+
+  <details>
+    <summary>Vollständige Änderungshistorie ({historie.length})</summary>
+    <table class="changelog-tabelle">
+      <thead>
+        <tr>
+          <th scope="col">Datum</th>
+          <th scope="col">Art</th>
+          <th scope="col">Feld</th>
+          <th scope="col">Notiz</th>
+        </tr>
+      </thead>
+      <tbody>
+        {
+          historie.map((c) => (
+            <tr>
+              <td style="white-space:nowrap;font-variant-numeric:tabular-nums">{datum(c.datum)}</td>
+              <td>{label(ART_LABEL, c.art)}</td>
+              <td>{c.feld ?? '—'}</td>
+              <td>{c.notiz}</td>
+            </tr>
+          ))
+        }
+      </tbody>
+    </table>
+  </details>
+</footer>

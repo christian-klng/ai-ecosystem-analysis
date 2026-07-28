@@ -1,0 +1,50 @@
+---
+import { getEntries } from 'astro:content';
+import {
+  LEISTUNGSART_LABEL,
+  KOSTENMODELL_LABEL,
+  TRAEGERTYP_LABEL,
+  RAEUMLICH_LABEL,
+  label,
+} from '../lib/labels';
+import StatusPill from './StatusPill.astro';
+import type { Angebot } from '../lib/steckbrief';
+
+interface Props {
+  angebot: Angebot;
+}
+const { angebot } = Astro.props;
+const d = angebot.data;
+const traeger = await getEntries(d.traeger);
+const traegerNamen = traeger.map((t) => t.data.kurzname ?? t.data.name).join(', ');
+
+// Facetten als data-Attribute für den clientseitigen Filter (/angebote).
+const facetten = {
+  'data-status': d.status,
+  'data-leistungsart': d.leistungsart.join(' '),
+  'data-bedarfsphase': d.bedarfsphase.join(' '),
+  'data-zugangsregime': d.zugangsregime,
+  'data-kostenmodell': d.kostenmodell,
+  'data-kikompetenz': d.ki_kompetenz,
+  'data-zielgruppe': d.zielgruppe.join(' '),
+  'data-traegertyp': d.traegertyp,
+  'data-ressortlogik': d.ressortlogik,
+  'data-raeumlich': d.raeumlich,
+  'data-name': d.name.toLowerCase(),
+};
+const primaerLeistung = d.leistungsart[0] ? label(LEISTUNGSART_LABEL, d.leistungsart[0]) : null;
+---
+<li class={`card angebot-card ${d.status === 'beendet' ? 'is-beendet' : ''}`} {...facetten}>
+  <div class="card-meta">
+    <StatusPill status={d.status} />
+    <span class="badge">{label(TRAEGERTYP_LABEL, d.traegertyp)}</span>
+    {d.raeumlich !== 'berlin' && <span class="badge">{label(RAEUMLICH_LABEL, d.raeumlich)}</span>}
+  </div>
+  <h3><a href={`/angebote/${angebot.slug}`}>{d.name}</a></h3>
+  <p class="card-traeger">{traegerNamen}</p>
+  <p class="card-desc">{d.kurzbeschreibung}</p>
+  <div class="card-meta">
+    {primaerLeistung && <span class="badge">{primaerLeistung}</span>}
+    <span class="badge">{label(KOSTENMODELL_LABEL, d.kostenmodell)}</span>
+  </div>
+</li>

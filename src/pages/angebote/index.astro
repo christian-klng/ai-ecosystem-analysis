@@ -1,0 +1,201 @@
+---
+import { getCollection } from 'astro:content';
+import Base from '../../layouts/Base.astro';
+import AngebotCard from '../../components/AngebotCard.astro';
+import { STATUS_RANG } from '../../lib/steckbrief';
+import {
+  STATUS_LABEL,
+  BEDARFSPHASE_LABEL,
+  LEISTUNGSART_LABEL,
+  ZUGANGSREGIME_LABEL,
+  KOSTENMODELL_LABEL,
+  KI_KOMPETENZ_LABEL,
+  ZIELGRUPPE_LABEL,
+  TRAEGERTYP_LABEL,
+} from '../../lib/labels';
+
+const angebote = await getCollection('angebote');
+
+// Sortierung: aktive zuerst, innerhalb gleicher Statusgruppe alphabetisch.
+angebote.sort((a, b) => {
+  const r = (STATUS_RANG[a.data.status] ?? 9) - (STATUS_RANG[b.data.status] ?? 9);
+  return r !== 0 ? r : a.data.name.localeCompare(b.data.name, 'de');
+});
+
+// Facettengruppen mit serverseitig gezählten Werten.
+type FacetKey =
+  | 'bedarfsphase'
+  | 'leistungsart'
+  | 'kostenmodell'
+  | 'zugangsregime'
+  | 'kikompetenz'
+  | 'zielgruppe'
+  | 'traegertyp'
+  | 'status';
+
+const facetDef: { key: FacetKey; titel: string; labels: Record<string, string>; get: (d: any) => string[] }[] = [
+  { key: 'bedarfsphase', titel: 'Bedarfsphase', labels: BEDARFSPHASE_LABEL, get: (d) => d.bedarfsphase },
+  { key: 'leistungsart', titel: 'Leistungsart', labels: LEISTUNGSART_LABEL, get: (d) => d.leistungsart },
+  { key: 'kostenmodell', titel: 'Kosten', labels: KOSTENMODELL_LABEL, get: (d) => [d.kostenmodell] },
+  { key: 'zugangsregime', titel: 'Zugang', labels: ZUGANGSREGIME_LABEL, get: (d) => [d.zugangsregime] },
+  { key: 'kikompetenz', titel: 'KI-Kompetenz', labels: KI_KOMPETENZ_LABEL, get: (d) => [d.ki_kompetenz] },
+  { key: 'zielgruppe', titel: 'Zielgruppe', labels: ZIELGRUPPE_LABEL, get: (d) => d.zielgruppe },
+  { key: 'traegertyp', titel: 'Trägertyp', labels: TRAEGERTYP_LABEL, get: (d) => [d.traegertyp] },
+  { key: 'status', titel: 'Status', labels: STATUS_LABEL, get: (d) => [d.status] },
+];
+
+const facetGroups = facetDef.map((f) => {
+  const counts = new Map<string, number>();
+  for (const a of angebote) {
+    for (const v of f.get(a.data)) counts.set(v, (counts.get(v) ?? 0) + 1);
+  }
+  const werte = [...counts.entries()]
+    .map(([value, count]) => ({ value, count, label: f.labels[value] ?? value }))
+    .sort((a, b) => b.count - a.count || a.label.localeCompare(b.label, 'de'));
+  return { key: f.key, titel: f.titel, werte };
+});
+---
+
+<Base
+  title="Alle Angebote"
+  description="Filterbares Verzeichnis der Unterstützungsangebote für Berliner KMU rund um Künstliche Intelligenz."
+  nav="angebote"
+  embeddable={true}
+>
+  <h1>Alle Angebote</h1>
+  <p class="section-intro">
+    {angebote.length} Steckbriefe. Filtern Sie nach Ihrer Situation, oder durchsuchen Sie den Bestand.
+    Jeder Filter lässt sich verlinken und in eine Einbettung vorbelegen.
+  </p>
+
+  <div class="filter-layout">
+    <form class="filter-panel" id="filter-form" aria-label="Angebote filtern">
+      <div class="filter-toolbar" style="margin-bottom:1rem">
+        <button type="button" class="btn" id="filter-reset">Filter zurücksetzen</button>
+      </div>
+      {
+        facetGroups.map((g) => (
+          <fieldset class="filter-group" data-facet={g.key}>
+            <legend>{g.titel}</legend>
+            {g.werte.map((w) => (
+              <label class="filter-option">
+                <input type="checkbox" name={g.key} value={w.value} />
+                <span>{w.label}</span>
+                <span class="filter-count">{w.count}</span>
+              </label>
+            ))}
+          </fieldset>
+        ))
+      }
+    </form>
+
+    <div>
+      <div class="filter-toolbar">
+        <div class="search-box">
+          <label class="visually-hidden" for="suche">Angebote durchsuchen</label>
+          <input type="search" id="suche" placeholder="Suchen (Name, Träger, Stichwort) …" autocomplete="off" />
+        </div>
+        <p class="result-count" id="result-count" aria-live="polite">{angebote.length} Angebote</p>
+      </div>
+
+      <ul class="card-grid" id="angebote-liste">
+        {angebote.map((angebot) => <AngebotCard angebot={angebot} />)}
+      </ul>
+      <p id="keine-treffer" hidden style="padding:2rem;text-align:center;color:var(--fg-muted)">
+        Keine Angebote passen zu dieser Auswahl. <button type="button" class="btn" id="filter-reset-2">Filter zurücksetzen</button>
+      </p>
+    </div>
+  </div>
+</Base>
+
+<script>
+  // Clientseitiger Facetten- und Textfilter (funktioniert offline und im Embed).
+  const form = document.getElementById('filter-form') as HTMLFormElement;
+  const suche = document.getElementById('suche') as HTMLInputElement;
+  const liste = document.getElementById('angebote-liste')!;
+  const cards = Array.from(liste.querySelectorAll<HTMLElement>('.angebot-card'));
+  const resultCount = document.getElementById('result-count')!;
+  const keineTreffer = document.getElementById('keine-treffer')!;
+
+  const facetKeys = Array.from(form.querySelectorAll<HTMLElement>('[data-facet]')).map(
+    (el) => el.dataset.facet!,
+  );
+
+  function checkedValues(key: string): string[] {
+    return Array.from(form.querySelectorAll<HTMLInputElement>(`input[name="${key}"]:checked`)).map(
+      (i) => i.value,
+    );
+  }
+
+  function cardTokens(card: HTMLElement, key: string): string[] {
+    const raw = card.dataset[key] ?? '';
+    return raw.split(/\s+/).filter(Boolean);
+  }
+
+  function applyFilter() {
+    const term = suche.value.trim().toLowerCase();
+    const active: Record<string, string[]> = {};
+    for (const key of facetKeys) active[key] = checkedValues(key);
+
+    let sichtbar = 0;
+    for (const card of cards) {
+      let ok = true;
+      for (const key of facetKeys) {
+        const sel = active[key];
+        if (sel.length === 0) continue;
+        const tokens = cardTokens(card, key);
+        if (!sel.some((v) => tokens.includes(v))) {
+          ok = false;
+          break;
+        }
+      }
+      if (ok && term) {
+        ok = (card.textContent ?? '').toLowerCase().includes(term);
+      }
+      card.hidden = !ok;
+      if (ok) sichtbar++;
+    }
+
+    resultCount.textContent = `${sichtbar} von ${cards.length} Angeboten`;
+    keineTreffer.hidden = sichtbar !== 0;
+    syncUrl(active, term);
+  }
+
+  function syncUrl(active: Record<string, string[]>, term: string) {
+    const params = new URLSearchParams();
+    for (const key of facetKeys) for (const v of active[key]) params.append(key, v);
+    if (term) params.set('q', term);
+    // embed-Parameter erhalten
+    const cur = new URLSearchParams(location.search);
+    if (cur.get('embed') === '1') params.set('embed', '1');
+    const qs = params.toString();
+    history.replaceState(null, '', qs ? `?${qs}` : location.pathname);
+  }
+
+  function readUrl() {
+    const params = new URLSearchParams(location.search);
+    for (const key of facetKeys) {
+      const vals = params.getAll(key);
+      for (const v of vals) {
+        const box = form.querySelector<HTMLInputElement>(`input[name="${key}"][value="${CSS.escape(v)}"]`);
+        if (box) box.checked = true;
+      }
+    }
+    const q = params.get('q');
+    if (q) suche.value = q;
+  }
+
+  function resetFilter() {
+    form.reset();
+    suche.value = '';
+    applyFilter();
+  }
+
+  form.addEventListener('change', applyFilter);
+  suche.addEventListener('input', applyFilter);
+  document.getElementById('filter-reset')?.addEventListener('click', resetFilter);
+  document.getElementById('filter-reset-2')?.addEventListener('click', resetFilter);
+
+  readUrl();
+  applyFilter();
+</script>

@@ -1,0 +1,16 @@
+# Primär für den lokalen Test des Container-Builds gedacht:
+#   SITE_URL=https://ki-angebote.example docker compose up --build
+#   -> http://localhost:8080
+#
+# Coolify kann diese Datei ebenfalls als „Docker Compose"-Deployment verwenden;
+# einfacher und empfohlen ist dort aber der Dockerfile-Build (siehe DEPLOYMENT.md).
+services:
+  web:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        SITE_URL: ${SITE_URL:-https://ki-angebote.berlin}
+    ports:
+      - "8080:80"
+    restart: unless-stopped

@@ -1,0 +1,42 @@
+---
+import { getEntry } from 'astro:content';
+import { datum } from '../lib/labels';
+import type { Angebot } from '../lib/steckbrief';
+
+interface Props {
+  angebot: Angebot;
+}
+const { angebot } = Astro.props;
+const d = angebot.data;
+
+// Nachfolge-Angebot auflösen (falls vorhanden), um konkret zu verweisen.
+let nachfolger: { slug: string; name: string } | null = null;
+if (d.nachfolger) {
+  const n = await getEntry('angebote', d.nachfolger.id);
+  if (n) nachfolger = { slug: n.slug, name: n.data.name };
+}
+
+const texte: Record<string, { titel: string }> = {
+  auslaufend: { titel: 'Dieses Angebot läuft aus.' },
+  ausgesetzt: { titel: 'Dieses Angebot ist derzeit ausgesetzt.' },
+  beendet: { titel: 'Dieses Angebot ist beendet.' },
+  unklar: { titel: 'Der Status dieses Angebots ist unklar.' },
+};
+const t = texte[d.status];
+---
+{
+  t && (
+    <div class={`status-banner ${d.status}`} role="note">
+      <strong>{t.titel}</strong>
+      {d.finanzierung_bis && d.status === 'auslaufend' && (
+        <span> Die Finanzierung ist bis <strong>{datum(d.finanzierung_bis)}</strong> gesichert.</span>
+      )}
+      {d.status_begruendung && <span>{' '}{d.status_begruendung}</span>}
+      {nachfolger && (
+        <span>
+          {' '}Nachfolgeangebot: <a href={`/angebote/${nachfolger.slug}`}>{nachfolger.name}</a>.
+        </span>
+      )}
+    </div>
+  )
+}

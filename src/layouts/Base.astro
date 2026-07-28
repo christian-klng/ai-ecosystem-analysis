@@ -1,0 +1,98 @@
+---
+import '../styles/global.css';
+
+interface Props {
+  title: string;
+  description?: string;
+  /** Im Embed-Modus (?embed=1) werden Kopf- und Fußbereich ausgeblendet. */
+  embeddable?: boolean;
+  /** aktueller Navigationspunkt für aria-current */
+  nav?: 'start' | 'angebote' | 'aenderungen' | 'kriterien' | 'einbetten';
+}
+
+const { title, description, embeddable = false, nav } = Astro.props;
+const siteName = 'KI-Angebote Berlin';
+const fullTitle = title === siteName ? title : `${title} — ${siteName}`;
+---
+
+<!doctype html>
+<html lang="de">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{fullTitle}</title>
+    {description && <meta name="description" content={description} />}
+    <meta name="color-scheme" content="light dark" />
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    {embeddable && (
+      <script is:inline>
+        // Embed-Modus: Chrome ausblenden und Höhe an das einbettende Fenster melden.
+        (function () {
+          try {
+            const params = new URLSearchParams(location.search);
+            if (params.get('embed') === '1') {
+              document.documentElement.classList.add('embed-pending');
+              document.addEventListener('DOMContentLoaded', function () {
+                document.body.classList.add('embed');
+                function postHeight() {
+                  const h = document.body.scrollHeight;
+                  parent.postMessage({ kiAngeboteBerlin: true, height: h }, '*');
+                }
+                postHeight();
+                if (window.ResizeObserver) {
+                  new ResizeObserver(postHeight).observe(document.body);
+                }
+              });
+            }
+          } catch (e) {}
+        })();
+      </script>
+    )}
+  </head>
+  <body>
+    <a class="skip-link" href="#inhalt">Zum Inhalt springen</a>
+    <header class="site-header">
+      <div class="wrap">
+        <a class="brand" href="/">
+          <span class="brand-mark" aria-hidden="true">KI</span>
+          <span>KI-Angebote Berlin</span>
+        </a>
+        <nav class="site-nav" aria-label="Hauptnavigation">
+          <a href="/" aria-current={nav === 'start' ? 'page' : undefined}>Start</a>
+          <a href="/angebote" aria-current={nav === 'angebote' ? 'page' : undefined}>Alle Angebote</a>
+          <a href="/aenderungen" aria-current={nav === 'aenderungen' ? 'page' : undefined}>Was ist neu</a>
+          <a href="/kriterien" aria-current={nav === 'kriterien' ? 'page' : undefined}>Aufnahmekriterien</a>
+          <a href="/einbetten" aria-current={nav === 'einbetten' ? 'page' : undefined}>Einbetten</a>
+        </nav>
+      </div>
+    </header>
+
+    <main id="inhalt">
+      <div class="wrap">
+        <slot />
+      </div>
+    </main>
+
+    <footer class="site-footer">
+      <div class="wrap">
+        <div>
+          <p style="margin:0 0 0.4rem">
+            <strong>KI-Angebote Berlin</strong> — Arbeitstitel, ein Produkt des Forschungsprojekts KI-InnoX
+          </p>
+          <p style="margin:0; max-width:38rem">
+            Redaktionell gepflegtes Verzeichnis von Unterstützungsangeboten für Berliner KMU rund um
+            Künstliche Intelligenz. Keine Gewähr für Vollständigkeit oder Richtigkeit; verbindlich ist
+            stets die Auskunft des jeweiligen Trägers.
+          </p>
+        </div>
+        <nav aria-label="Rechtliches und Daten">
+          <a href="/impressum">Impressum</a>
+          <a href="/datenschutz">Datenschutz</a>
+          <a href="/barrierefreiheit">Barrierefreiheit</a>
+          <a href="/api/angebote.json">Offene Daten</a>
+          <a href="/aenderungen.xml">Änderungs-Feed</a>
+        </nav>
+      </div>
+    </footer>
+  </body>
+</html>

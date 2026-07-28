@@ -5,7 +5,6 @@ import { SITUATIONEN, datum } from '../lib/labels';
 import { aenderungsstrom, ART_LABEL } from '../lib/steckbrief';
 
 const angebote = await getCollection('angebote');
-const aktive = angebote.filter((a) => a.data.status === 'aktiv').length;
 
 // Situations-Kacheln verlinken auf vorgefilterte Angebotslisten.
 function situationHref(leistungsarten: string[]): string {
@@ -37,9 +36,6 @@ const strom = aenderungsstrom(angebote).slice(0, 6);
       Trägerseiten zeigen. Dieser Wegweiser ordnet sie nach Ihrer Situation und sagt bei jedem
       Angebot, wann es zuletzt geprüft wurde.
     </p>
-    <p style="color:var(--fg-muted)">
-      Derzeit {angebote.length} Steckbriefe, davon {aktive} aktiv nutzbar.
-    </p>
   </section>
 
   <section aria-labelledby="h-situation">
@@ -64,7 +60,6 @@ const strom = aenderungsstrom(angebote).slice(0, 6);
 
   <section aria-labelledby="h-voraussetzung">
     <h2 id="h-voraussetzung">Oder nach Voraussetzung filtern</h2>
-    <p class="section-intro">Die Frage, die am meisten Zeit spart: Was können Sie sofort nutzen, und wofür brauchen Sie Vorlauf?</p>
     <ul class="tile-grid">
       {
         voraussetzungen.map((v) => (
@@ -84,10 +79,6 @@ const strom = aenderungsstrom(angebote).slice(0, 6);
 
   <section aria-labelledby="h-neu">
     <h2 id="h-neu">Was sich zuletzt geändert hat</h2>
-    <p class="section-intro">
-      Der eigentliche Mehrwert dieses Verzeichnisses: Wir dokumentieren, wann ein Angebot ausläuft,
-      beendet wird oder sich inhaltlich ändert – auch dann, wenn die Trägerseite es nicht tut.
-    </p>
     <ul class="strom">
       {
         strom.map((e) => (

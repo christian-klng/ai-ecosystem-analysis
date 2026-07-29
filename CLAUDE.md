@@ -35,10 +35,14 @@ eine endgültige Domain steht noch aus.
 - **Geschlossenes Schema.** Alle Vokabulare sind Zod-Enums in
   [`src/content/config.ts`](src/content/config.ts). Ein falscher Wert bricht den Build — das ist
   gewollt. Anzeigetexte dazu in [`src/lib/labels.ts`](src/lib/labels.ts).
-- **Aktualisierungsdisziplin.** „Geprüft" ≠ „Geändert". Bei inhaltlicher Änderung einen
-  `changelog`-Eintrag (`art: geaendert`/`statuswechsel`, mit `feld`) ergänzen; bei reiner Prüfung
-  nur `geprueft_am` setzen. Der Validator ([`scripts/validate-changelog.mjs`](scripts/validate-changelog.mjs))
-  erzwingt das vor jedem Build.
+- **Aktualisierungsdisziplin.** „Geprüft" ≠ „Geändert". **Jede inhaltliche Änderung an einem
+  Steckbrief** (`src/content/angebote/*.md`) braucht **im selben Edit** einen `changelog`-Eintrag
+  (`art: geaendert`/`statuswechsel`, mit `feld`) **und** ein aktualisiertes `geprueft_am`; bei reiner
+  Prüfung ohne Änderung nur `geprueft_am`. Der Validator
+  ([`scripts/validate-changelog.mjs`](scripts/validate-changelog.mjs)) erzwingt vor jedem Build nur
+  die **Struktur** (Changelog vorhanden, genau ein `neu`, `feld` bei `geaendert`/`statuswechsel`,
+  keine Zukunftsdaten, nicht-aktiver Status begründet) — er erkennt **nicht**, ob eine Feldänderung
+  ohne Changelog-Eintrag blieb. Diese Kopplung liegt bei der Redaktion, nicht an der Maschine.
 - **Einbettbarkeit nicht kaputt machen.** `nginx.conf` setzt bewusst **kein** `X-Frame-Options`
   und keine restriktive `frame-ancestors`-CSP — Partner sollen das Verzeichnis per iFrame
   (`?embed=1`) einbetten können.
@@ -46,6 +50,15 @@ eine endgültige Domain steht noch aus.
   Embed). Facetten-/Textfilter in [`src/pages/angebote/index.astro`](src/pages/angebote/index.astro).
 - **Neuen Steckbrief anlegen:** Datei unter `src/content/angebote/<slug>.md`; bestehenden als
   Vorlage nehmen. Träger in `src/content/traeger/*.yaml`.
+- **Negativ-Liste (ausgeschlossene Kandidaten).** Geprüfte, aber **nicht** aufgenommene Angebote
+  landen als abgespeckte Steckbriefe in `src/content/ausgeschlossen/*.yaml` (Collection
+  `ausgeschlossen`, Schema in [`src/content/config.ts`](src/content/config.ts)). Sie sind **bewusst
+  nicht im Verzeichnis sichtbar** — nur in den offenen Daten (`/api/angebote.json`, Key
+  `ausgeschlossen`). Zweck: Recherche-Gedächtnis (was wurde warum ausgeschlossen) und Wiedervorlage
+  (`wiedervorlage_am`) zur periodischen Neuprüfung. Pflicht: `name`, `kurzbeschreibung`,
+  `ausschlussgrund` (Enum `AUSSCHLUSSGRUND`), `ausschluss_notiz`, `geprueft_am`, `geprueft_von`.
+  **Ausgeschlossenes Angebot anlegen:** `src/content/ausgeschlossen/_vorlage.yaml` kopieren.
+  `ausschluss_notiz` steht öffentlich — sachlich/neutral formulieren.
 
 ## Entschieden (2026-07)
 

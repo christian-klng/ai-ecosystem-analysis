@@ -61,12 +61,34 @@ export const GET: APIRoute = async ({ site }) => {
     }),
   );
 
+  // Negativ-Liste: geprüfte, aber NICHT aufgenommene Kandidaten. Erscheint bewusst
+  // nicht im Verzeichnis, nur hier — als Recherche-Gedächtnis und für die Wiedervorlage.
+  const ausgeschlossenColl = await getCollection('ausgeschlossen');
+  const ausgeschlossen = ausgeschlossenColl.map((a) => ({
+    id: a.id.replace(/\.(ya?ml|json)$/i, ''),
+    name: a.data.name,
+    kurzbeschreibung: a.data.kurzbeschreibung,
+    ausschlussgrund: a.data.ausschlussgrund,
+    ausschluss_notiz: a.data.ausschluss_notiz,
+    traeger_name: a.data.traeger_name ?? null,
+    url: a.data.url ?? null,
+    traegertyp: a.data.traegertyp ?? null,
+    raeumlich: a.data.raeumlich ?? null,
+    ki_bezug: a.data.ki_bezug ?? null,
+    geprueft_am: a.data.geprueft_am,
+    geprueft_von: a.data.geprueft_von,
+    wiedervorlage_am: a.data.wiedervorlage_am ?? null,
+    links: a.data.links,
+  }));
+
   const payload = {
     quelle: 'KI-Angebote Berlin',
     lizenz: 'CC BY 4.0',
     stand: new Date().toISOString().slice(0, 10),
     anzahl: items.length,
     angebote: items,
+    anzahl_ausgeschlossen: ausgeschlossen.length,
+    ausgeschlossen,
   };
 
   return new Response(JSON.stringify(payload, null, 2), {

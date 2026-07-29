@@ -1,0 +1,35 @@
+# Vorlage für einen Eintrag der Negativ-Liste (ausgeschlossener Kandidat).
+#
+# Diese Datei beginnt mit "_" und wird von Astro NICHT in die Collection geladen —
+# sie erscheint also nicht im öffentlichen JSON. Zum Anlegen eines echten Eintrags:
+# kopieren nach src/content/ausgeschlossen/<slug>.yaml und "_"-Zeilen/Kommentare löschen.
+#
+# Pflichtfelder: name, kurzbeschreibung, ausschlussgrund, ausschluss_notiz,
+#                geprueft_am, geprueft_von.
+# Alles Weitere ist optional. ausschluss_notiz steht öffentlich (CC BY 4.0) — sachlich halten.
+
+name: "Beispielangebot XY"
+kurzbeschreibung: "Ein Satz: Was ist das? — damit später erkennbar ist, worum es ging."
+
+# Erlaubte ausschlussgrund-Werte (siehe AUSSCHLUSSGRUND in src/content/config.ts):
+#   kein-ki-bezug | ausserhalb-berlin | falsche-zielgruppe |
+#   kein-abgrenzbares-angebot | dublette | eingestellt |
+#   zu-unspezifisch | nicht-oeffentlich | sonstiges
+ausschlussgrund: sonstiges
+ausschluss_notiz: "Kurze, sachliche Begründung, warum dies (noch) nicht als Angebot geführt wird."
+
+# Optionale Rahmendaten:
+traeger_name: "Name der Organisation"
+url: "https://example.org/"
+# traegertyp: privatwirtschaft        # Werte wie in TRAEGERTYPEN
+# raeumlich: bundesweit-berlin-zugang # Werte wie in RAEUMLICH
+ki_bezug: teilweise                    # ja | teilweise | nein
+
+# Pflege / Wiedervorlage:
+geprueft_am: 2026-07-29
+geprueft_von: "CK"
+wiedervorlage_am: 2027-01-29           # oder weglassen / null = keine geplant
+links:
+  - url: "https://example.org/"
+    titel: "Startseite"
+    abgerufen: 2026-07-29

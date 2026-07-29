@@ -129,6 +129,20 @@ export const EINTRAGSTYP = [
 
 export const VOLATILITAET = ['hoch', 'mittel', 'niedrig'] as const; // Prüfintervall 90 / 180 / 365 Tage
 
+// Gründe, warum ein geprüfter Kandidat NICHT als Angebot aufgenommen wurde (Negativ-Liste).
+// Geschlossenes Vokabular, damit die Ausschlüsse systematisch auswertbar und wiedervorlagefähig bleiben.
+export const AUSSCHLUSSGRUND = [
+  'kein-ki-bezug',              // kein hinreichender Bezug zu Künstlicher Intelligenz
+  'ausserhalb-berlin',         // kein Berlin-/Brandenburg-Bezug, kein Berliner Zugang
+  'falsche-zielgruppe',        // richtet sich nicht an KMU (z. B. nur Konzerne, Verbraucher, Studierende)
+  'kein-abgrenzbares-angebot', // reine Information/News/Blog, keine in Anspruch nehmbare Leistung
+  'dublette',                  // Dublette zu einem bereits erfassten Steckbrief
+  'eingestellt',               // existiert nicht mehr / dauerhaft eingestellt
+  'zu-unspezifisch',           // nicht profilierbar (kein greifbarer Leistungskern)
+  'nicht-oeffentlich',         // intern / nicht öffentlich zugänglich
+  'sonstiges',
+] as const;
+
 // Dreistufige Bewertung der Informationsqualität der Quelle (Forschungsmetadaten)
 const jaTeilweiseNein = z.enum(['ja', 'teilweise', 'nein']);
 
@@ -238,4 +252,41 @@ const angebote = defineCollection({
   }),
 });
 
-export const collections = { traeger, angebote };
+// --- Negativ-Liste (ausgeschlossene Kandidaten) ---
+//
+// Abgespeckte Steckbriefe geprüfter, aber NICHT aufgenommener Kandidaten. Erscheinen
+// bewusst nicht im Verzeichnis (nichts rendert diese Collection), nur in den offenen
+// Daten (/api/angebote.json). Zweck: Recherche-Gedächtnis + Wiedervorlage zur
+// periodischen Neuprüfung. Kein Changelog-Zwang; die Pflege steuert `wiedervorlage_am`.
+const ausgeschlossen = defineCollection({
+  type: 'data',
+  schema: z.object({
+    name: z.string(),
+    kurzbeschreibung: z.string(),          // "Was ist das?" in einem Satz
+    ausschlussgrund: z.enum(AUSSCHLUSSGRUND),
+    ausschluss_notiz: z.string(),          // kurze Begründung im Klartext (öffentlich, sachlich halten)
+
+    // Leichte Rahmendaten, alle optional, wiederverwendete Vokabulare
+    traeger_name: z.string().optional(),   // frei, da meist kein eigener Trägerdatensatz existiert
+    url: z.string().url().optional(),
+    traegertyp: z.enum(TRAEGERTYPEN).optional(),
+    raeumlich: z.enum(RAEUMLICH).optional(),
+    ki_bezug: jaTeilweiseNein.optional(),
+
+    // Pflege / Wiedervorlage
+    geprueft_am: z.date(),
+    geprueft_von: z.string(),
+    wiedervorlage_am: z.date().nullable().default(null), // wann erneut prüfen; null = keine geplant
+    links: z
+      .array(
+        z.object({
+          url: z.string().url(),
+          titel: z.string(),
+          abgerufen: z.date(),
+        }),
+      )
+      .default([]),
+  }),
+});
+
+export const collections = { traeger, angebote, ausgeschlossen };

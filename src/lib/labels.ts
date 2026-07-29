@@ -112,6 +112,19 @@ export const STATUS_LABEL: Record<string, string> = {
   unklar: 'Status unklar',
 };
 
+// Negativ-Liste: Gründe für den Ausschluss (nicht in der UI, aber für Daten und Auswertung).
+export const AUSSCHLUSSGRUND_LABEL: Record<string, string> = {
+  'kein-ki-bezug': 'Kein KI-Bezug',
+  'ausserhalb-berlin': 'Außerhalb Berlin / kein Berlin-Zugang',
+  'falsche-zielgruppe': 'Falsche Zielgruppe (nicht KMU)',
+  'kein-abgrenzbares-angebot': 'Kein abgrenzbares Angebot (reine Information)',
+  dublette: 'Dublette zu bestehendem Steckbrief',
+  eingestellt: 'Eingestellt / existiert nicht mehr',
+  'zu-unspezifisch': 'Zu unspezifisch (kein greifbarer Leistungskern)',
+  'nicht-oeffentlich': 'Nicht öffentlich zugänglich',
+  sonstiges: 'Sonstiges',
+};
+
 /** Einstiegssituationen der Startseite (Bedarfslage, PLAN.md 3.1 A). */
 export const SITUATIONEN: { id: string; frage: string; phase: string; leistungsarten: string[] }[] = [
   {

@@ -1,0 +1,18 @@
+name: "Deep Tech Hub / MotionLab.Berlin"
+kurzbeschreibung: "Deep-Tech- und Hardware-Makerspace bzw. Community-Standort (MotionLab.Berlin), Teil der „Zukunftsorte Berlin“ (gestartet 2024)."
+
+ausschlussgrund: zu-unspezifisch
+ausschluss_notiz: "Standort-/Makerspace-Angebot (Flächen, Ausstattung, Community) ohne profilierbaren, KI-spezifischen Leistungskern für KMU. Bereits 2024 etabliert; MotionLab ist zudem über „Zukunftsorte Berlin“ erfasst. Kein neuer Akteur."
+
+traeger_name: "MotionLab.Berlin"
+url: "https://motionlab.berlin/"
+traegertyp: privatwirtschaft
+raeumlich: berlin
+ki_bezug: teilweise
+
+geprueft_am: 2026-07-28
+geprueft_von: "CK"
+links:
+  - url: "https://motionlab.berlin/"
+    titel: "Startseite"
+    abgerufen: 2026-07-28

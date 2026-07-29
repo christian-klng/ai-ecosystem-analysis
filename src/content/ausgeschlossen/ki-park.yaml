@@ -1,0 +1,18 @@
+name: "KI Park e.V."
+kurzbeschreibung: "Berliner Verein zur Vernetzung von Unternehmen und Institutionen rund um Künstliche Intelligenz, mit Mitgliedsbeiträgen und Expert-Group-Meetups."
+
+ausschlussgrund: falsche-zielgruppe
+ausschluss_notiz: "Mitgliederverein mit Ausrichtung auf KI-Anbieter und -Entwicklung; kein niedrigschwelliges Unterstützungsangebot für nicht-technische KMU. Aktivität zuletzt gering (Meetup am 30.06.2026 mit vier Teilnehmenden)."
+
+traeger_name: "KI Park e.V."
+url: "https://kipark.de/"
+traegertyp: verein
+raeumlich: berlin
+ki_bezug: ja
+
+geprueft_am: 2026-07-22
+geprueft_von: "CK"
+links:
+  - url: "https://kipark.de/"
+    titel: "Startseite"
+    abgerufen: 2026-07-22

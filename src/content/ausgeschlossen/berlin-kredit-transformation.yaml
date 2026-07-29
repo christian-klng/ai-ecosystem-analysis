@@ -1,0 +1,13 @@
+name: "Berlin Kredit Transformation"
+kurzbeschreibung: "Förderkredit der Investitionsbank Berlin (IBB) für allgemeine betriebliche Transformationsvorhaben."
+
+ausschlussgrund: kein-ki-bezug
+ausschluss_notiz: "Allgemeiner Transformations-/Investitionskredit ohne spezifischen Bezug zu Künstlicher Intelligenz oder Digitalisierung. Erneut zu prüfen, falls eine KI-/Digitalisierungslinie ergänzt wird."
+
+traeger_name: "Investitionsbank Berlin (IBB)"
+traegertyp: land-berlin
+raeumlich: berlin
+ki_bezug: nein
+
+geprueft_am: 2026-07-28
+geprueft_von: "CK"

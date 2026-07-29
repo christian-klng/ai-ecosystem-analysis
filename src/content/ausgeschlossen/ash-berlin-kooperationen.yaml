@@ -1,0 +1,18 @@
+name: "ASH Berlin — Kooperationen & Praxiskoordination"
+kurzbeschreibung: "Kooperations- und Praxispartnerschaften der Alice Salomon Hochschule Berlin in sozialen und gesundheitlichen Fachdomänen."
+
+ausschlussgrund: falsche-zielgruppe
+ausschluss_notiz: "Kooperationsangebote auf soziale und gesundheitliche Fachdomänen begrenzt; kein erkennbarer Unternehmens-/KMU-Kanal auf der Website und kein KI-spezifisches Leistungsangebot."
+
+traeger_name: "Alice Salomon Hochschule Berlin (ASH)"
+url: "https://www.ash-berlin.eu/"
+traegertyp: hochschule
+raeumlich: berlin
+ki_bezug: teilweise
+
+geprueft_am: 2026-07-22
+geprueft_von: "CK"
+links:
+  - url: "https://www.ash-berlin.eu/"
+    titel: "Startseite"
+    abgerufen: 2026-07-22

@@ -1,0 +1,19 @@
+name: "Factory Berlin"
+kurzbeschreibung: "Mitgliederbasierte Startup- und Tech-Community mit Campus-Standorten in Berlin."
+
+ausschlussgrund: eingestellt
+ausschluss_notiz: "Physisches Community-/Campus-Angebot faktisch eingestellt: Campus-Zugänge in Berlin und Hamburg zum 01.11. beendet, Standort Görlitzer Park aufgegeben, keine Day Passes. Website und Marke bestehen unter dem Narrativ „next chapter“ fort und erwecken einen gegenteiligen Eindruck. Bei tragfähigem Nachfolgeformat erneut zu prüfen."
+
+traeger_name: "Factory Berlin"
+url: "https://factory.network/"
+traegertyp: privatwirtschaft
+raeumlich: berlin
+ki_bezug: nein
+
+geprueft_am: 2026-07-22
+geprueft_von: "CK"
+wiedervorlage_am: 2027-01-22
+links:
+  - url: "https://factory.network/"
+    titel: "Startseite"
+    abgerufen: 2026-07-22

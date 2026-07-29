@@ -1,0 +1,18 @@
+name: "K.I.E.Z. / AI NATION Accelerator"
+kurzbeschreibung: "Inkubator und Accelerator für KI-Startups aus den Berliner Hochschulen (Science & Startups); die Marke K.I.E.Z. ist in AI NATION aufgegangen."
+
+ausschlussgrund: falsche-zielgruppe
+ausschluss_notiz: "Zugang strukturell an wissenschaftsbasierte Neugründungen aus den Berliner Hochschulen gebunden; bestehende KMU sind von der Zielgruppe ausgenommen. Die Legacy-Domain kiez.ai leitet auf ai-nation.de um."
+
+traeger_name: "Science & Startups (FU, HU, TU Berlin, Charité)"
+url: "https://www.ai-nation.de/"
+traegertyp: hochschule
+raeumlich: berlin
+ki_bezug: ja
+
+geprueft_am: 2026-07-22
+geprueft_von: "CK"
+links:
+  - url: "https://www.ai-nation.de/"
+    titel: "AI NATION"
+    abgerufen: 2026-07-22
